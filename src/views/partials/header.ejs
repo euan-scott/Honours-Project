@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title || "TrainFuel" %></title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="container nav">
+      <div class="brand">TrainFuel</div>
+
+      <% if (nav && nav.isAuthed) { %>
+        <div class="navlinks">
+          <a href="/dashboard">Home</a>
+          <a href="/training">Training</a>
+          <a href="/nutrition/diary">Food Diary</a>
+          <a href="/nutrition/logs">Food History</a>
+          <a href="/profile">Profile</a>
+          <a href="/logout">Logout</a>
+        </div>
+      <% } else { %>
+        <div class="navlinks">
+          <a href="/login">Login</a>
+          <a href="/register">Register</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="container">

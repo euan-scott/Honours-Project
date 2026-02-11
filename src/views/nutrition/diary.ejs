@@ -1,0 +1,603 @@
+<%- include("../partials/header", { title: "Food Diary", nav: { isAuthed: true } }) %>
+
+<link rel="stylesheet" href="/css/diary.css">
+
+<div class="container">
+  <div class="diary-header">
+    <div>
+      <h1>Food Diary</h1>
+      <p class="helper">Log foods into meals. Totals update automatically.</p>
+    </div>
+
+    <div class="diary-date">
+  <div>
+    <label for="date">Date</label>
+    <input id="date" type="date" value="<%= selectedDate %>" onchange="loadDiary()">
+  </div>
+</div>
+
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Day totals</h3>
+      <p class="helper">Based on foods logged in your diary.</p>
+
+      <div id="dayTotals" class="pill-row"></div>
+
+      <div class="section-gap"></div>
+
+      <h3 id="remainingTitle" class="section-title">Remaining</h3>
+      <p id="remainingHelper" class="helper">Based on your saved nutrition goals.</p>
+
+      <div id="dayRemaining" class="pill-row"></div>
+
+      <p id="dayStatus" class="status-line"></p>
+    </div>
+
+    <div class="card">
+      <h3>Add food</h3>
+      <p class="helper">Choose a meal to log food.</p>
+      <div class="actions">
+        <button class="btn" type="button" onclick="openModal(1)">Breakfast</button>
+        <button class="btn" type="button" onclick="openModal(2)">Lunch</button>
+        <button class="btn" type="button" onclick="openModal(3)">Dinner</button>
+        <button class="btn" type="button" onclick="openModal(4)">Snacks</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <h3>Meals</h3>
+    <div id="meals" class="meals-list"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modalBack" class="modal-back">
+  <div class="modal">
+    <div class="modal-top">
+      <div>
+        <h3 id="modalTitle">Add</h3>
+        <p class="helper">Search, select a food, enter grams, or quick-add. You can also create a new food.</p>
+      </div>
+      <div class="actions" style="margin:0;">
+        <button class="btn btn-secondary" type="button" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="row" style="margin-top:12px;">
+      <div>
+        <label for="foodQuery">Search</label>
+        <input id="foodQuery" placeholder="e.g. chicken, rice, yoghurt">
+      </div>
+      <div style="display:flex; align-items:flex-end;">
+        <button class="btn" type="button" onclick="searchFoods()">Search</button>
+      </div>
+    </div>
+
+    <div id="foodError" class="error"></div>
+    <div id="foodResults" class="results"></div>
+
+    <!-- Selected food add -->
+    <div class="modal-section">
+      <h3>Selected</h3>
+      <div id="selectedInfo" class="helper">Nothing selected yet.</div>
+
+      <div class="row">
+        <div>
+          <label for="grams">Grams</label>
+          <input id="grams" type="number" min="0" step="1" placeholder="e.g. 180">
+        </div>
+        <div>
+          <label for="notes">Notes</label>
+          <input id="notes" placeholder="optional">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" onclick="addSelectedFood()">Add to meal</button>
+      </div>
+
+      <div id="preview" class="helper"></div>
+    </div>
+
+    <!-- Quick add -->
+    <div class="modal-section">
+      <h3>Quick add</h3>
+      <p class="helper">Calories required. Macros optional.</p>
+
+      <div class="row">
+        <div>
+          <label for="qCal">Calories</label>
+          <input id="qCal" type="number" min="0" step="1" placeholder="e.g. 250">
+        </div>
+        <div>
+          <label for="qP">Protein (g)</label>
+          <input id="qP" type="number" min="0" step="0.1">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="qC">Carbs (g)</label>
+          <input id="qC" type="number" min="0" step="0.1">
+        </div>
+        <div>
+          <label for="qF">Fat (g)</label>
+          <input id="qF" type="number" min="0" step="0.1">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" type="button" onclick="quickAdd()">Add quick</button>
+      </div>
+    </div>
+
+    <!-- Create food -->
+    <div class="modal-section">
+      <h3>Create new food</h3>
+      <p class="helper">Add a food with macros per 100g so it appears in search next time.</p>
+
+      <div class="row">
+        <div>
+          <label for="newName">Name</label>
+          <input id="newName" placeholder="e.g. protein yoghurt">
+        </div>
+        <div>
+          <label for="newBrand">Brand (optional)</label>
+          <input id="newBrand" placeholder="e.g. Tesco">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="newCal">Calories (Per 100g)</label>
+          <input id="newCal" type="number" min="0" step="1" placeholder="e.g. 80">
+        </div>
+        <div>
+          <label for="newP">Protein (Per 100g)</label>
+          <input id="newP" type="number" min="0" step="0.1" placeholder="e.g. 10.2">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="newC">Carbs (Per 100g)</label>
+          <input id="newC" type="number" min="0" step="0.1" placeholder="e.g. 6.0">
+        </div>
+        <div>
+          <label for="newF">Fat (Per 100g)</label>
+          <input id="newF" type="number" min="0" step="0.1" placeholder="e.g. 2.2">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" type="button" onclick="createFood()">Create food</button>
+      </div>
+
+      <div id="createFoodMsg" class="helper"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const MEAL_NAMES = { 1: "Breakfast", 2: "Lunch", 3: "Dinner", 4: "Snacks" };
+  let currentMealType = null;
+  let selectedFood = null;
+
+  const el = (id) => document.getElementById(id);
+
+  function openModal(mealType) {
+    currentMealType = mealType;
+    selectedFood = null;
+
+    el("modalTitle").textContent = `Add to ${MEAL_NAMES[mealType]}`;
+    el("modalBack").style.display = "flex";
+
+    el("foodError").textContent = "";
+    el("foodResults").innerHTML = "";
+    el("selectedInfo").textContent = "Nothing selected yet.";
+    el("preview").textContent = "";
+    el("foodQuery").value = "";
+    el("grams").value = "";
+    el("notes").value = "";
+
+    el("qCal").value = "";
+    el("qP").value = "";
+    el("qC").value = "";
+    el("qF").value = "";
+
+    el("newName").value = "";
+    el("newBrand").value = "";
+    el("newCal").value = "";
+    el("newP").value = "";
+    el("newC").value = "";
+    el("newF").value = "";
+    el("createFoodMsg").textContent = "";
+  }
+
+  function closeModal() {
+    el("modalBack").style.display = "none";
+  }
+
+  function getDate() {
+    return el("date").value;
+  }
+
+  function pill(text) {
+    const d = document.createElement("div");
+    d.className = "pill";
+    d.textContent = text;
+    return d;
+  }
+
+  function verifiedTickHtml(isVerified) {
+    return isVerified ? `<span class="verified" title="Verified">&#10003;</span>` : "";
+  }
+
+  async function loadDiary() {
+    const res = await fetch(`/api/nutrition/diary?date=${encodeURIComponent(getDate())}`, { credentials: "include" });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const statusEl = el("dayStatus");
+      statusEl.textContent = data.error || `Failed to load diary (${res.status})`;
+      statusEl.className = "status-line is-warn";
+      return;
+    }
+
+    // --- Totals ---
+    el("dayTotals").innerHTML = "";
+    el("dayTotals").appendChild(pill(`Calories: ${data.totals.calories} kcal`));
+    el("dayTotals").appendChild(pill(`Protein: ${data.totals.protein} g`));
+    el("dayTotals").appendChild(pill(`Carbs: ${data.totals.carbs} g`));
+    el("dayTotals").appendChild(pill(`Fat: ${data.totals.fat} g`));
+
+    // --- Remaining (only when targets exist) ---
+    const hasTargets = !!data.targets;
+    el("dayRemaining").innerHTML = "";
+
+    el("remainingTitle").style.display = hasTargets ? "" : "none";
+    el("remainingHelper").style.display = hasTargets ? "" : "none";
+    el("dayRemaining").style.display = hasTargets ? "flex" : "none";
+
+    if (hasTargets && data.remaining) {
+      el("dayRemaining").appendChild(pill(`Calories: ${data.remaining.calories}/${data.targets.calories} kcal`));
+      el("dayRemaining").appendChild(pill(`Protein: ${data.remaining.protein}/${data.targets.protein} g`));
+      el("dayRemaining").appendChild(pill(`Carbs: ${data.remaining.carbs}/${data.targets.carbs} g`));
+      el("dayRemaining").appendChild(pill(`Fat: ${data.remaining.fat}/${data.targets.fat} g`));
+    }
+
+    // --- Status ---
+    const statusEl = el("dayStatus");
+    statusEl.textContent = hasTargets ? "Targets loaded." : "No targets set yet. Set goals in Profile.";
+    statusEl.className = `status-line ${hasTargets ? "is-ok" : "is-warn"}`;
+
+    // --- Meals ---
+    const mealsEl = el("meals");
+    mealsEl.innerHTML = "";
+
+    for (const mt of [1, 2, 3, 4]) {
+      const meal = data.meals[mt];
+      if (!meal) continue;
+
+      const card = document.createElement("div");
+      card.className = "meal-card";
+
+      const header = document.createElement("div");
+      header.className = "meal-header";
+
+      const left = document.createElement("div");
+
+      const title = document.createElement("h4");
+      title.className = "meal-title";
+      title.textContent = meal.name;
+      left.appendChild(title);
+
+      const sub = document.createElement("div");
+      sub.className = "meal-sub";
+      sub.textContent = `${meal.totals.calories} kcal • ${meal.totals.protein}g Protein • ${meal.totals.carbs}g Carbs • ${meal.totals.fat}g Fat`;
+      left.appendChild(sub);
+
+      header.appendChild(left);
+
+      const addBtn = document.createElement("button");
+      addBtn.className = "btn";
+      addBtn.type = "button";
+      addBtn.textContent = "Add";
+      addBtn.onclick = () => openModal(mt);
+
+      const right = document.createElement("div");
+      right.className = "meal-actions";
+      right.appendChild(addBtn);
+
+      header.appendChild(right);
+      card.appendChild(header);
+
+      const itemsWrap = document.createElement("div");
+      itemsWrap.className = "items";
+
+      if (!meal.items || meal.items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "helper";
+        empty.textContent = "No items logged.";
+        itemsWrap.appendChild(empty);
+      } else {
+        for (const item of meal.items) {
+          const row = document.createElement("div");
+          row.className = "item";
+
+          const left = document.createElement("div");
+
+          if (item.type === "food") {
+            left.innerHTML = `
+              <div class="item-title">
+                ${item.name}
+                ${verifiedTickHtml(item.isVerified)}
+              </div>
+              <div class="item-sub">${item.grams}g • ${item.calories} kcal • P ${item.protein} • C ${item.carbs} • F ${item.fat}${item.notes ? " • " + item.notes : ""}</div>
+            `;
+          } else {
+            left.innerHTML = `
+              <div class="item-title">Quick add</div>
+              <div class="item-sub">${item.calories} kcal${item.protein!=null?` • P ${item.protein}`:""}${item.carbs!=null?` • C ${item.carbs}`:""}${item.fat!=null?` • F ${item.fat}`:""}${item.notes ? " • " + item.notes : ""}</div>
+            `;
+          }
+
+          const actions = document.createElement("div");
+          actions.className = "item-actions";
+
+          const edit = document.createElement("button");
+          edit.className = "btn btn-secondary";
+          edit.textContent = "Edit";
+          edit.onclick = () => {
+            window.location.href = `/nutrition/diary/item/${item.diaryItemId}/edit`;
+          };
+                  
+          const del = document.createElement("button");
+          del.className = "btn btn-secondary";
+          del.type = "button";
+          del.textContent = "Delete";
+          del.onclick = async () => { await deleteItem(item.diaryItemId); };
+                  
+          actions.appendChild(edit);
+          actions.appendChild(del);
+
+          row.appendChild(left);
+          row.appendChild(actions);
+          itemsWrap.appendChild(row);
+        }
+      }
+
+      card.appendChild(itemsWrap);
+      mealsEl.appendChild(card);
+    }
+  }
+
+  async function deleteItem(diaryItemId) {
+    if (!confirm("Delete this entry?")) return;
+
+    const res = await fetch(`/api/nutrition/diary/items/${diaryItemId}`, {
+      method: "DELETE",
+      credentials: "include"
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.error || `Delete failed (${res.status})`);
+      return;
+    }
+
+    await loadDiary();
+  }
+
+  async function searchFoods() {
+    el("foodError").textContent = "";
+    el("foodResults").innerHTML = "";
+
+    const q = el("foodQuery").value.trim();
+    if (!q) return;
+
+    const res = await fetch(`/api/nutrition/foods?query=${encodeURIComponent(q)}`, { credentials: "include" });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      el("foodError").textContent = data.error || `Search failed (${res.status})`;
+      return;
+    }
+
+    if (!data.foods || data.foods.length === 0) {
+      el("foodResults").innerHTML = `<div class="result"><div class="meta">No results. Use Quick add or Create new food.</div></div>`;
+      return;
+    }
+
+    for (const f of data.foods) {
+      const div = document.createElement("div");
+      div.className = "result";
+
+      const isVerified = (f.IsVerified === true || f.IsVerified === 1 || f.IsVerified === "true");
+
+      div.innerHTML = `
+        <strong>
+          ${f.Name}${f.Brand ? " — " + f.Brand : ""}
+          ${verifiedTickHtml(isVerified)}
+        </strong>
+        <div class="meta">
+          Per 100g: ${f.CaloriesPer100g} kcal • P ${f.ProteinPer100g} • C ${f.CarbsPer100g} • F ${f.FatPer100g}
+        </div>
+      `;
+
+      div.onclick = () => {
+        selectedFood = f;
+
+        el("selectedInfo").innerHTML = `
+          <strong>
+            ${f.Name}${f.Brand ? " — " + f.Brand : ""}
+            ${verifiedTickHtml(isVerified)}
+          </strong>
+          <span class="helper">(${f.CaloriesPer100g} kcal / 100g)</span>
+        `;
+      };
+
+      el("foodResults").appendChild(div);
+    }
+  }
+
+  el("grams")?.addEventListener("input", () => {
+    if (!selectedFood) return;
+    const grams = Number(el("grams").value);
+    if (!Number.isFinite(grams) || grams <= 0) {
+      el("preview").textContent = "";
+      return;
+    }
+    const kcal = Math.round(grams * (Number(selectedFood.CaloriesPer100g) / 100));
+    const p = Number((grams * (Number(selectedFood.ProteinPer100g) / 100)).toFixed(1));
+    const c = Number((grams * (Number(selectedFood.CarbsPer100g) / 100)).toFixed(1));
+    const f = Number((grams * (Number(selectedFood.FatPer100g) / 100)).toFixed(1));
+    el("preview").textContent = `Preview: ${kcal} kcal • P ${p}g • C ${c}g • F ${f}g`;
+  });
+
+  async function addSelectedFood() {
+    el("foodError").textContent = "";
+
+    if (!currentMealType) {
+      el("foodError").textContent = "Select a meal first.";
+      return;
+    }
+    if (!selectedFood) {
+      el("foodError").textContent = "Select a food first (or use Quick add / Create food).";
+      return;
+    }
+
+    const grams = Number(el("grams").value);
+    if (!Number.isFinite(grams) || grams <= 0) {
+      el("foodError").textContent = "Enter grams (must be > 0).";
+      return;
+    }
+
+    const body = {
+      date: getDate(),
+      mealType: currentMealType,
+      foodId: selectedFood.FoodId,
+      grams,
+      notes: el("notes").value || null
+    };
+
+    const res = await fetch("/api/nutrition/diary/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      el("foodError").textContent = data.error || `Add failed (${res.status})`;
+      return;
+    }
+
+    closeModal();
+    await loadDiary();
+  }
+
+  async function quickAdd() {
+    el("foodError").textContent = "";
+
+    if (!currentMealType) {
+      el("foodError").textContent = "Select a meal first.";
+      return;
+    }
+
+    const calories = Number(el("qCal").value);
+    if (!Number.isFinite(calories) || calories <= 0) {
+      el("foodError").textContent = "Quick add: calories is required (> 0).";
+      return;
+    }
+
+    const body = {
+      date: getDate(),
+      mealType: currentMealType,
+      calories,
+      protein: el("qP").value ? Number(el("qP").value) : null,
+      carbs: el("qC").value ? Number(el("qC").value) : null,
+      fat: el("qF").value ? Number(el("qF").value) : null,
+      notes: el("notes").value || null
+    };
+
+    const res = await fetch("/api/nutrition/diary/quick-add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      el("foodError").textContent = data.error || `Quick add failed (${res.status})`;
+      return;
+    }
+
+    closeModal();
+    await loadDiary();
+  }
+
+  async function createFood() {
+    el("foodError").textContent = "";
+    el("createFoodMsg").textContent = "";
+
+    const name = el("newName").value.trim();
+    const brand = el("newBrand").value.trim();
+
+    const caloriesPer100g = Number(el("newCal").value);
+    const proteinPer100g  = Number(el("newP").value);
+    const carbsPer100g    = Number(el("newC").value);
+    const fatPer100g      = Number(el("newF").value);
+
+    if (!name) {
+      el("foodError").textContent = "Food name is required.";
+      return;
+    }
+
+    if (![caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g].every(n => Number.isFinite(n) && n >= 0)) {
+      el("foodError").textContent = "Enter valid macros per 100g (numbers ≥ 0).";
+      return;
+    }
+
+    const res = await fetch("/api/nutrition/foods", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name, brand: brand || null, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g })
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      el("foodError").textContent = data.error || `Create food failed (${res.status})`;
+      return;
+    }
+
+    selectedFood = data.food;
+
+    el("selectedInfo").innerHTML = `
+      <strong>${selectedFood.Name}${selectedFood.Brand ? " — " + selectedFood.Brand : ""}</strong>
+      <span class="helper">(${selectedFood.CaloriesPer100g} kcal / 100g)</span>
+    `;
+
+    el("createFoodMsg").textContent = "Food created — now enter grams above and click Add to meal.";
+
+    el("foodQuery").value = name;
+    await searchFoods();
+  }
+
+
+  el("date")?.addEventListener("input", () => {
+    clearTimeout(window.__dateTimer);
+    window.__dateTimer = setTimeout(loadDiary, 150);
+  });
+
+  loadDiary();
+</script>
+
+<%- include("../partials/footer") %>

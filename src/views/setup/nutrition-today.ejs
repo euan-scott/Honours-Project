@@ -1,0 +1,55 @@
+<%- include("../partials/header", { title: "Nutrition today", nav: { isAuthed: true } }) %>
+
+<div class="card" style="max-width:720px; margin: 18px auto;">
+  <h2>Nutrition today</h2>
+  <p>Log today’s calories and macros to enable energy balance feedback.</p>
+
+  <form method="POST" action="/setup/nutrition-today">
+    <input type="hidden" name="skip" value="no" />
+
+    <label>Date</label>
+    <input type="date" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required />
+
+    <div style="height:12px"></div>
+
+    <div class="row">
+      <div>
+        <label>Calories</label>
+        <input type="number" name="calories" min="0" required />
+      </div>
+      <div>
+        <label>Protein (g)</label>
+        <input type="number" name="protein" min="0" required />
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="row">
+      <div>
+        <label>Carbs (g)</label>
+        <input type="number" name="carbs" min="0" required />
+      </div>
+      <div>
+        <label>Fat (g)</label>
+        <input type="number" name="fat" min="0" required />
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <label>Notes (optional)</label>
+    <input name="notes" />
+
+    <div class="actions">
+      <button class="btn" type="submit">Save & finish</button>
+    </div>
+  </form>
+
+  <form method="POST" action="/setup/nutrition-today" style="margin-top:10px;">
+    <input type="hidden" name="skip" value="yes" />
+    <button class="btn btn-secondary" type="submit">Skip</button>
+  </form>
+</div>
+
+<%- include("../partials/footer") %>

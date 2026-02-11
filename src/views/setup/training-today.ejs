@@ -1,0 +1,50 @@
+<%- include("../partials/header", { title: "Training today", nav: { isAuthed: true } }) %>
+
+<div class="card" style="max-width:720px; margin: 18px auto;">
+  <h2>Training today</h2>
+  <p>Log one session to get your dashboard populated.</p>
+
+  <form method="POST" action="/setup/training-today">
+    <input type="hidden" name="skip" value="no" />
+
+    <div class="row">
+      <div>
+        <label>Date</label>
+        <input type="date" name="date" value="<%= new Date().toISOString().slice(0,10) %>" required />
+      </div>
+      <div>
+        <label>Type</label>
+        <input name="type" placeholder="run / gym / calisthenics" required />
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="row">
+      <div>
+        <label>Duration (minutes)</label>
+        <input type="number" name="durationMin" min="1" required />
+      </div>
+      <div>
+        <label>RPE (1–10)</label>
+        <input type="number" name="rpe" min="1" max="10" required />
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <label>Notes (optional)</label>
+    <input name="notes" />
+
+    <div class="actions">
+      <button class="btn" type="submit">Save & continue</button>
+    </div>
+  </form>
+
+  <form method="POST" action="/setup/training-today" style="margin-top:10px;">
+    <input type="hidden" name="skip" value="yes" />
+    <button class="btn btn-secondary" type="submit">Skip</button>
+  </form>
+</div>
+
+<%- include("../partials/footer") %>

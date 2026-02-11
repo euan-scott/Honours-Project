@@ -1,0 +1,58 @@
+<%- include("../partials/header", { title: "Edit diary item", nav: { isAuthed: true } }) %>
+
+<div class="container" style="max-width:720px;">
+  <div class="card" style="margin-top:14px;">
+    <h3>Edit diary item</h3>
+
+    <% if (error) { %>
+      <div class="error" style="margin-top:10px;"><%= error %></div>
+    <% } %>
+
+    <% if (!item) { %>
+      <div class="actions" style="margin-top:12px;">
+        <a class="btn" style="padding:10px 12px; border-radius:10px;" href="/nutrition/diary">Back</a>
+      </div>
+    <% } else { %>
+
+      <div class="helper" style="margin-top:6px;">
+        <strong><%= item.foodName || "Food" %></strong><% if (item.brand) { %> — <%= item.brand %><% } %>
+      </div>
+
+      <form method="POST" action="/nutrition/diary/item/<%= item.diaryItemId %>/edit" style="margin-top:12px;">
+        <div class="row">
+          <div>
+            <label for="mealType">Meal</label>
+            <select id="mealType" name="mealType" required>
+              <option value="1" <%= item.mealType === 1 ? "selected" : "" %>>Breakfast</option>
+              <option value="2" <%= item.mealType === 2 ? "selected" : "" %>>Lunch</option>
+              <option value="3" <%= item.mealType === 3 ? "selected" : "" %>>Dinner</option>
+              <option value="4" <%= item.mealType === 4 ? "selected" : "" %>>Snacks</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="grams">Grams</label>
+            <input id="grams" name="grams" type="number" min="1" step="0.1" required
+                   value="<%= item.grams != null ? item.grams : '' %>">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="notes">Notes (optional)</label>
+            <input id="notes" name="notes" value="<%= item.notes || '' %>">
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:12px;">
+          <button class="btn" type="submit" style="padding:10px 12px; border-radius:10px;">Save</button>
+          <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;"
+             href="/nutrition/diary?date=<%= String(item.logDate).slice(0,10) %>">Cancel</a>
+        </div>
+      </form>
+
+    <% } %>
+  </div>
+</div>
+
+<%- include("../partials/footer") %>

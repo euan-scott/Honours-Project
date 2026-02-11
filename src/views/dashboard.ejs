@@ -1,0 +1,173 @@
+<%- include("partials/header", { title: "Dashboard", nav: { isAuthed: true } }) %>
+
+<div class="page-header">
+  <div>
+    <h2>Home</h2>
+    <p class="muted">Logged in as: <%= user.email %></p>
+  </div>
+
+  <div class="actions">
+    <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/profile">
+      Edit profile
+    </a>
+  </div>
+</div>
+
+
+<!-- ===================== -->
+<!-- Top cards -->
+<!-- ===================== -->
+
+<div class="grid grid-2" style="margin-top:12px;">
+
+  <!-- Training Load -->
+  <div class="card">
+    <div class="card-head">
+      <h3 style="margin:0;">Training Load</h3>
+      <span class="streak-chip">
+        <% if (trainingStreak > 0) { %>🔥 <% } %>
+        <%= trainingStreak %> day<%= trainingStreak === 1 ? "" : "s" %> streak
+      </span>
+    </div>
+
+    <div class="actions">
+      <% 
+        const badgeClass = acwrStatus === "Optimal" ? "ok"
+          : (acwrStatus === "Caution" ? "warn"
+          : (acwrStatus === "High risk" ? "risk" : ""));
+      %>
+      <span class="badge <%= badgeClass %>"><%= acwrStatus %></span>
+    </div>
+
+    <table class="table">
+      <tr><th>Acute (7 days)</th><td><%= loads.acuteLoad %></td></tr>
+      <tr><th>Chronic (28 days)</th><td><%= loads.chronicLoad %></td></tr>
+      <tr><th>ACWR</th><td><%= loads.acwr || "N/A" %></td></tr>
+    </table>
+
+    <div class="actions">
+      <a class="btn" style="padding:10px 12px; border-radius:10px;" href="/training/new">Add training</a>
+      <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/training">View training history</a>
+    </div>
+  </div>
+
+
+  <!-- Food Diary -->
+  <div class="card">
+    <div class="card-head">
+      <h3 style="margin:0;">Food Diary (Today)</h3>
+      <span class="streak-chip">
+        <% if (diaryStreak > 0) { %>🔥 <% } %>
+        <%= diaryStreak %> day<%= diaryStreak === 1 ? "" : "s" %> streak
+      </span>
+    </div>
+
+    <p class="helper">Based on foods logged in your diary.</p>
+
+    <% if (nutritionSummary && nutritionSummary.totals.calories > 0) { %>
+      <table class="table">
+        <tr><th>Calories</th><td><%= nutritionSummary.totals.calories %> kcal</td></tr>
+        <tr><th>Protein</th><td><%= nutritionSummary.totals.protein %> g</td></tr>
+        <tr><th>Carbs</th><td><%= nutritionSummary.totals.carbs %> g</td></tr>
+        <tr><th>Fat</th><td><%= nutritionSummary.totals.fat %> g</td></tr>
+      </table>
+    <% } else { %>
+      <p class="helper">No food logged yet today.</p>
+    <% } %>
+
+    <div class="actions">
+      <a class="btn" style="padding:10px 12px; border-radius:10px;" href="/nutrition/diary">Log food</a>
+      <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/nutrition/logs">View food history</a>
+    </div>
+  </div>
+
+</div>
+
+
+
+<!-- ===================== -->
+<!-- Weekly Summary -->
+<!-- ===================== -->
+
+<div class="card span-2" style="margin-top:12px;">
+  <div class="card-head">
+    <h3>Last 7 days</h3>
+    <span class="muted">
+      <%= weeklySummary.nutrition.range.start %> – <%= weeklySummary.nutrition.range.end %>
+    </span>
+  </div>
+
+  <div class="grid grid-2">
+
+    <div>
+      <p class="helper">Training</p>
+      <table class="table">
+        <tr><th>Sessions</th><td><%= weeklySummary.training.sessions %></td></tr>
+        <tr><th>Days trained</th><td><%= weeklySummary.training.daysTrained %> / 7</td></tr>
+        <tr><th>Total load</th><td><%= weeklySummary.training.totalLoad %></td></tr>
+        <tr><th>Total minutes</th><td><%= weeklySummary.training.totalMinutes %> min</td></tr>
+      </table>
+    </div>
+
+    <div>
+      <p class="helper">Food</p>
+      <table class="table">
+        <tr><th>Days logged</th><td><%= weeklySummary.nutrition.daysLogged %> / 7</td></tr>
+        <tr><th>Avg calories</th><td><%= weeklySummary.nutrition.avgCalories %> kcal</td></tr>
+        <tr><th>Avg protein</th><td><%= weeklySummary.nutrition.avgProtein %> g</td></tr>
+        <tr><th>Avg carbs</th><td><%= weeklySummary.nutrition.avgCarbs %> g</td></tr>
+        <tr><th>Avg fats</th><td><%= weeklySummary.nutrition.avgFat %> g</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- ===================== -->
+<!-- Recovery -->
+<!-- ===================== -->
+
+<div class="card span-2" style="margin-top:12px;">
+  <div class="card-head" style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <h3 style="margin:0;">Recovery</h3>
+      <span class="muted">Today and last 7 days</span>
+    </div>
+
+    <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/recovery">
+      <%= recoveryToday ? "Update today" : "Check in today" %>
+    </a>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:10px;">
+
+    <div>
+      <p class="helper">Today</p>
+      <table class="table">
+        <tr>
+          <th>Sleep</th>
+          <td><%= recoveryToday?.SleepHours != null ? recoveryToday.SleepHours + " h" : "—" %></td>
+        </tr>
+        <tr>
+          <th>Score</th>
+          <td><%= recoveryToday?.RecoveryScore != null ? recoveryToday.RecoveryScore + " / 5" : "—" %></td>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+      <p class="helper">Last 7 days</p>
+      <table class="table">
+        <tr><th>Check-ins</th><td><%= recoverySummary ? recoverySummary.daysCheckedIn : 0 %> / 7</td></tr>
+        <tr><th>Avg score</th><td><%= recoverySummary?.avgRecoveryScore ?? "N/A" %></td></tr>
+        <tr><th>Avg sleep</th><td><%= recoverySummary?.avgSleepHours ? recoverySummary.avgSleepHours + " h" : "N/A" %></td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+<%- include("partials/footer") %>

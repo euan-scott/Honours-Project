@@ -1,0 +1,42 @@
+<%- include("partials/header", { title: "Login", nav: { isAuthed: false } }) %>
+
+<div class="card" style="max-width:520px; margin: 18px auto;">
+  <h2>Welcome back</h2>
+  <p>Log in to view your dashboard and tracking.</p>
+
+  <form method="POST" action="/login">
+    <label>Email</label>
+    <input name="email" type="email" required />
+
+    <div style="height:12px"></div>
+
+    <label>Password</label>
+    <input name="password" type="password" required />
+
+    <div class="actions">
+      <button class="btn" type="submit">Login</button>
+      <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/register">Create an account</a>
+    </div>
+
+  </form>
+
+  <div class="login-meta">
+
+    <div class="login-error">
+      <% if (error) { %>
+        <span class="error-text"><%= error %></span>
+      <% } %>
+    </div>
+
+    <a href="/forgot-password" class="forgot-link">
+      Forgot password?
+    </a>
+  </div>
+
+  <% if (message) { %>
+    <p style="margin: 12px 0;"><%= message %></p>
+  <% } %>
+
+</div>
+
+<%- include("partials/footer") %>

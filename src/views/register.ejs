@@ -1,0 +1,23 @@
+<%- include("partials/header", { title: "Register", nav: { isAuthed: false } }) %>
+
+<div class="card" style="max-width:520px; margin: 18px auto;">
+  <h2>Create your account</h2>
+  <p>Register with an email and password.</p>
+
+  <form method="POST" action="/register">
+    <label>Email</label>
+    <input type="email" name="email" required autocomplete="email" />
+
+    <div style="height:12px"></div>
+
+    <label>Password</label>
+    <input type="password" name="password" required minlength="8" />
+
+    <div class="actions">
+      <button class="btn" type="submit">Create account</button>
+      <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/login">I already have an account</a>
+    </div>
+  </form>
+</div>
+
+<%- include("partials/footer") %>

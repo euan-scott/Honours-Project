@@ -1,0 +1,59 @@
+<%- include("partials/header", { title: "Recovery check-in", nav: { isAuthed: true } }) %>
+
+<div class="card" style="max-width:520px; margin: 18px auto;">
+  <h2>Recovery check-in</h2>
+  <p>Quick daily check-in to support safer training decisions.</p>
+
+  <% if (error) { %>
+    <p style="margin: 12px 0; color: #ff6b6b;"><%= error %></p>
+  <% } %>
+
+  <form method="POST" action="/recovery">
+    <label>Date</label>
+    <input type="text" value="<%= today %>" disabled />
+
+    <div style="height:12px"></div>
+
+    <label>Sleep hours</label>
+    <input
+      name="sleepHours"
+      type="number"
+      step="0.5"
+      min="0"
+      max="16"
+      value="<%= existing && existing.SleepHours !== null && typeof existing.SleepHours !== 'undefined' ? existing.SleepHours : '' %>"
+      placeholder="e.g., 7.5"
+    />
+
+    <div style="height:12px"></div>
+
+    <label>Recovery score (1–5)</label>
+    <select name="recoveryScore">
+      <option value="">How do you feel today? 1 (sore) - 5 (great)</option>
+      <% for (let i = 1; i <= 5; i++) { %>
+        <option
+          value="<%= i %>"
+          <%= (existing && Number(existing.RecoveryScore) === i) ? "selected" : "" %>
+        ><%= i %></option>
+      <% } %>
+    </select>
+
+    <div style="height:12px"></div>
+
+    <label>Notes (optional)</label>
+    <input
+      name="notes"
+      type="text"
+      maxlength="255"
+      value="<%= existing && existing.Notes ? existing.Notes : '' %>"
+      placeholder="Anything affecting recovery (optional)"
+    />
+
+    <div class="actions" style="margin-top: 14px;">
+      <button class="btn" type="submit">Save check-in</button>
+      <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/dashboard">Back</a>
+    </div>
+  </form>
+</div>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,13 @@
+PAGES
+
+Update Food 
+
+NOTES
+Water?
+
+CRUD
+Edit buttons for food
+Delete buttons for training
+
+Logo for website
+Name for website

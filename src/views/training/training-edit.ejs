@@ -1,0 +1,83 @@
+<%- include("../partials/header", { title: "Edit training", nav: { isAuthed: true } }) %>
+
+<div class="card" style="max-width:520px; margin: 18px auto;">
+  <h2>Edit training session</h2>
+  <p class="muted">Update the details below.</p>
+
+  <% if (error) { %>
+    <p style="margin: 12px 0; color: #ff6b6b;"><%= error %></p>
+  <% } %>
+
+  <form method="POST" action="/training/<%= session.SessionId %>/edit">
+    <label>Date</label>
+    <input
+      name="sessionDate"
+      type="date"
+      required
+      value="<%= session.SessionDate ? new Date(session.SessionDate).toISOString().slice(0,10) : "" %>"
+    />
+
+    <div style="height:12px"></div>
+
+    <label>Type</label>
+    <input
+      name="type"
+      type="text"
+      maxlength="50"
+      required
+      value="<%= session.Type || "" %>"
+      placeholder="e.g., Run, Legs"
+    />
+
+    <div style="height:12px"></div>
+
+    <label>Duration (minutes)</label>
+    <input
+      name="durationMin"
+      type="number"
+      min="0"
+      step="1"
+      required
+      value="<%= session.DurationMin != null ? session.DurationMin : "" %>"
+    />
+
+    <div style="height:12px"></div>
+
+    <label>RPE (1–10)</label>
+    <input
+      name="rpe"
+      type="number"
+      min="1"
+      max="10"
+      step="1"
+      required
+      value="<%= session.RPE != null ? session.RPE : "" %>"
+    />
+
+    <div style="height:12px"></div>
+
+    <label>Notes (optional)</label>
+    <input
+      name="notes"
+      type="text"
+      maxlength="255"
+      value="<%= session.Notes || "" %>"
+      placeholder="Optional"
+    />
+
+    <p class="helper" style="margin-top:10px;">
+      Load is calculated automatically from <strong>Duration × RPE</strong>.
+    </p>
+
+    <div class="actions" style="margin-top: 14px;">
+      <button class="btn" style="padding:10px 12px; border-radius:10px;" type="submit">
+        Save changes
+      </button>
+      <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/training">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+
+<%- include("../partials/footer") %>

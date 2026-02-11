@@ -1,0 +1,46 @@
+<%- include("../partials/header", { title: "Nutrition Logs", nav: { isAuthed: true } }) %>
+
+<h2>Food History</h2>
+<p>Daily totals from your food diary.</p>
+
+<div class="actions">
+  <a class="btn" style="padding:10px 12px; border-radius:10px;" href="/nutrition/diary">Go to Food Diary</a>
+    <a class="btn btn-secondary" style="padding:10px 12px; border-radius:10px;" href="/nutrition/export">Download as CSV</a>
+</div>
+
+<div class="card" style="margin-top:12px;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Calories</th>
+        <th>Protein</th>
+        <th>Carbs</th>
+        <th>Fat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (!logs || logs.length === 0) { %>
+        <tr>
+          <td colspan="5" class="muted">No logs yet.</td>
+        </tr>
+      <% } else { %>
+        <% logs.forEach(l => { 
+          const dateStr = (l.LogDate instanceof Date)
+            ? l.LogDate.toISOString().slice(0,10)
+            : String(l.LogDate).slice(0,10);
+        %>
+          <tr>
+            <td><%= dateStr %></td>
+            <td><%= l.calories %> kcal</td>
+            <td><%= l.protein %> g</td>
+            <td><%= l.carbs %> g</td>
+            <td><%= l.fat %> g</td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include("../partials/footer") %>

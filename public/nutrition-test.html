@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Nutrition API Test</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 16px; }
+      button { margin-right: 8px; margin-bottom: 8px; }
+      pre { background: #f5f5f5; padding: 12px; border-radius: 8px; overflow:auto; }
+      input { padding: 6px; margin-right: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Nutrition API Test</h1>
+
+    <div>
+      <input id="date" value="2026-02-02" />
+      <input id="query" value="chicken" />
+    </div>
+
+    <div style="margin-top: 12px;">
+      <button onclick="searchFoods()">1) Search Foods</button>
+      <button onclick="addChickenLunch()">2) Add Chicken to Lunch</button>
+      <button onclick="quickAddSnack()">3) Quick Add Snack</button>
+      <button onclick="getDiary()">4) Get Diary</button>
+    </div>
+
+    <h3>Output</h3>
+    <pre id="out">Click a button…</pre>
+
+    <script>
+      const out = document.getElementById("out");
+      const getDate = () => document.getElementById("date").value;
+
+      function show(x) {
+        out.textContent = typeof x === "string" ? x : JSON.stringify(x, null, 2);
+      }
+
+      async function searchFoods() {
+        const q = document.getElementById("query").value;
+        const res = await fetch(`/api/nutrition/foods?query=${encodeURIComponent(q)}`, {
+          credentials: "include"
+        });
+        const data = await res.json();
+        show({ status: res.status, data });
+        window.__foods = data.foods || [];
+      }
+
+      async function addChickenLunch() {
+        // This assumes FoodId=1 is chicken in your seeded table.
+        // If not, click "Search Foods" first and update the foodId below.
+        const body = {
+          date: getDate(),
+          mealType: 2,     // 2 = Lunch
+          foodId: 1,
+          grams: 180,
+          notes: "test chicken"
+        };
+
+        const res = await fetch(`/api/nutrition/diary/items`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        show({ status: res.status, bodySent: body, data });
+      }
+
+      async function quickAddSnack() {
+        const body = {
+          date: getDate(),
+          mealType: 4,  // 4 = Snacks
+          calories: 250,
+          protein: 10,
+          carbs: 30,
+          fat: 8,
+          notes: "test snack"
+        };
+
+        const res = await fetch(`/api/nutrition/diary/quick-add`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        show({ status: res.status, bodySent: body, data });
+      }
+
+      async function getDiary() {
+        const res = await fetch(`/api/nutrition/diary?date=${encodeURIComponent(getDate())}`, {
+          credentials: "include"
+        });
+        const data = await res.json();
+        show({ status: res.status, data });
+      }
+    </script>
+  </body>
+</html>

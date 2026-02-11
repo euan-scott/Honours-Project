@@ -1,0 +1,33 @@
+<%- include("../partials/header", { title: "Nutrition", nav: { isAuthed: true } }) %>
+
+<h2>Nutrition</h2>
+<p>Daily calorie and macro logs.</p>
+
+<div class="actions">
+  <a class="btn" style="padding:10px 12px; border-radius:10px;" href="/nutrition/new">Add / edit day</a>
+</div>
+
+<div class="card" style="margin-top:12px;">
+  <table class="table">
+    <tr>
+      <th>Date</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Notes</th>
+    </tr>
+
+    <% logs.forEach(l => { %>
+      <tr>
+        <td><%= l.LogDate.toISOString().slice(0,10) %></td>
+        <td><%= l.Calories %></td>
+        <td><%= l.ProteinG %> g</td>
+        <td><%= l.CarbsG %> g</td>
+        <td><%= l.FatG %> g</td>
+        <td><%= l.Notes || "" %></td>
+      </tr>
+    <% }) %>
+  </table>
+
+  <% if (!logs.length) { %>
+    <p class="helper">No logs yet. Add today’s intake to see energy balance on the dashboard.</p>
+  <% } %>
+</div>
+
+<%- include("../partials/footer") %>
