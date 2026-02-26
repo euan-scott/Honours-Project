@@ -233,6 +233,11 @@
   justify-content:center;
   padding:18px;
   z-index:50;
+
+  align-items:flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal{
