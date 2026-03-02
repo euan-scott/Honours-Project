@@ -177,7 +177,6 @@ async function addDiaryFoodItem(userId, { date, mealType, foodId, grams, notes =
       SELECT FoodId
       FROM dbo.Foods
       WHERE FoodId = @foodId
-        AND (CreatedByUserId IS NULL OR CreatedByUserId = @userId);
     `);
 
   if (!foodCheck.recordset.length) {
