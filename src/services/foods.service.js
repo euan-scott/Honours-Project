@@ -22,8 +22,7 @@ async function searchFoods(userId, query, limit = 20) {
         CaloriesPer100g, ProteinPer100g, CarbsPer100g, FatPer100g,
         CreatedByUserId, IsVerified
       FROM dbo.Foods
-      WHERE (CreatedByUserId IS NULL OR CreatedByUserId = @userId)
-        AND (Name LIKE @q OR Brand LIKE @q)
+      WHERE (Name LIKE @q OR Brand LIKE @q)
       ORDER BY
         CASE WHEN IsVerified = 1 THEN 0 ELSE 1 END,
         Name ASC;
