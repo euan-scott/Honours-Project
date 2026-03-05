@@ -12,7 +12,7 @@
           <option value="" <%= !user.Sex ? "selected" : "" %> >Select</option>
           <option value="male" <%= user.Sex==="male" ? "selected" : "" %> >Male</option>
           <option value="female" <%= user.Sex==="female" ? "selected" : "" %> >Female</option>
-          <option value="female" <%= user.Sex==="female" ? "selected" : "" %> Prefer not to say</option>
+          <option value="Prefer not to say" <%= user.Sex==="Prefer not to say" ? "selected" : "" %> Prefer not to say</option>
         </select>
       </div>
 
